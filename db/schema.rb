@@ -31,6 +31,4 @@ ActiveRecord::Schema.define(version: 20160513173046) do
     t.integer "state"
   end
 
-  add_index "students", ["user_id"], name: "index_students_on_user_id", unique: true
-
 end
