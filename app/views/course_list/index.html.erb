@@ -1,0 +1,6 @@
+<% @courses.each do |course| %>
+  <h1><%= course.course_name %></h1>
+    <% course.students.each do |student| %>
+    <li><%= student.user_name %></li>
+  <% end %>
+<% end %>
