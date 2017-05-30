@@ -1,4 +1,5 @@
 require "rails_helper"
+require "csv"
 
 describe "RecordImporter" do
 
@@ -6,20 +7,34 @@ describe "RecordImporter" do
 
     describe "imports students" do
       it "successfully adds students" do
-        txt = 
-          "user_id,user_name,state\nU531649,Noah Thomas,active\nU346561,Chloe Wood,active"
-        io = StringIO.new(txt)
-        importer = RecordImporter.new(io)
+        csv = [
+          ["user_id", "user_name", "state"],
+          { user_id: "U531649", user_name: "Noah Thomas", state: "active"}, 
+          { user_id: "U346561", user_name: "Chloe Wood", state: "active"} 
+        ]
+
+
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: false)).and_yield(csv[0])
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: true)).and_yield(csv[1]).and_yield(csv[2])
+
+        importer = RecordImporter.new("csv_file")
         importer.call
+
         expect(Student.count).to eql 2
       end
 
       it "updates duplicate user_ids" do
         Student.create!(user_id: "U531649", state: "active", user_name: "Jeremy Lipson")
-        txt = 
-          "user_id,user_name,state\nU531649,Noah Thomas,deleted"
-        io = StringIO.new(txt)
-        importer = RecordImporter.new(io)
+        csv = [
+          ["user_id", "user_name", "state"],
+          { user_id: "U531649", user_name: "Noah Thomas", state: "deleted"}.with_indifferent_access, 
+        ]
+
+
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: false)).and_yield(csv[0])
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: true)).and_yield(csv[1])
+
+        importer = RecordImporter.new("csv_file")
         importer.call
         expect(Student.count).to eql 1
         expect(Student.first.user_name).to eql "Noah Thomas"
@@ -29,20 +44,31 @@ describe "RecordImporter" do
 
     describe "imports courses" do
       it "successfully adds courses" do
-        txt = 
-          "course_id,course_name,state\nC628944,Suicide,active\nC424294,Chemistry,active"
-        io = StringIO.new(txt)
-        importer = RecordImporter.new(io)
+        csv = [
+          ["course_id", "course_name", "state"],
+          { course_id: "C628944", course_name: "Algebra", state: "active"}.with_indifferent_access,
+          { course_id: "C424294", course_name: "Chemistry", state: "active"}.with_indifferent_access
+        ]
+
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: false)).and_yield(csv[0])
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: true)).and_yield(csv[1]).and_yield(csv[2])
+
+        importer = RecordImporter.new("csv_file")
         importer.call
         expect(Course.count).to eql 2
       end
 
       it "updates duplicate user_ids" do
         Course.create!(course_id: "C628944", course_name: "Math", state: "active")
-        txt = 
-          "course_id,course_name,state\nC628944,Chemistry,active\n"
-        io = StringIO.new(txt)
-        importer = RecordImporter.new(io)
+        csv = [
+          ["course_id", "course_name", "state"],
+          { course_id: "C628944", course_name: "Chemistry", state: "active"}.with_indifferent_access,
+        ]
+
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: false)).and_yield(csv[0])
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: true)).and_yield(csv[1])
+
+        importer = RecordImporter.new("csv_file")
         importer.call
         expect(Course.count).to eql 1
         expect(Course.first.course_name).to eql "Chemistry"
@@ -55,11 +81,15 @@ describe "RecordImporter" do
         Student.create!(user_id: "U101")
         Course.create!(course_id: "C100")
         Course.create!(course_id: "C101")
+        csv = [
+          ["course_id", "user_id", "state"],
+          { course_id: "C100", user_id: "U101", state: "active"}.with_indifferent_access,
+        ]
 
-        txt = 
-          "course_id,user_id,state\nC100,U100,deleted\nC100,U101,active"
-        io = StringIO.new(txt)
-        importer = RecordImporter.new(io)
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: false)).and_yield(csv[0])
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: true)).and_yield(csv[1])
+
+        importer = RecordImporter.new("csv_file")
         importer.call
         expect(Course.count).to eql 2
       end
@@ -68,11 +98,16 @@ describe "RecordImporter" do
         Student.create!(user_id: "U100")
         Student.create!(user_id: "U101")
         Course.create!(course_id: "C101")
+        csv = [
+          ["course_id", "user_id", "state"],
+          { course_id: "C100", user_id: "U100", state: "deleted"}.with_indifferent_access,
+          { course_id: "C100", user_id: "U101", state: "deleted"}.with_indifferent_access,
+        ]
 
-        txt = 
-          "course_id,user_id,state\nC100,U100,deleted\nC101,U101,deleted\n"
-        io = StringIO.new(txt)
-        importer = RecordImporter.new(io)
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: false)).and_yield(csv[0])
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: true)).and_yield(csv[1]).and_yield(csv[2])
+
+        importer = RecordImporter.new("csv_file")
         importer.call
         expect(Course.count).to eql 1
       end
@@ -80,9 +115,12 @@ describe "RecordImporter" do
 
     describe "does not process CSV without the right headers" do
       it "should raise an exception if CSV header not supported" do
-        txt = "invalid_header\nMercy,Mercy,Mercy\n"
-        io = StringIO.new(txt)
-        importer = RecordImporter.new(io)
+        csv = [
+          [:mercy, :mercy, :mercy],
+        ]
+        expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: false)).and_yield(csv[0])
+
+        importer = RecordImporter.new("csv_file")
         expect{ importer.call }.to raise_error(RuntimeError, "Invalid csv file")
       end
     end
