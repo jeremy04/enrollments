@@ -1,6 +1,19 @@
-<% @courses.each do |course| %>
-  <h1><%= course.course_name %></h1>
-    <% course.students.each do |student| %>
-    <li><%= student.user_name %></li>
-  <% end %>
-<% end %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Course</th>
+      <th>User Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @courses.each do |course| %>
+      <% course.students.each do |student| %>
+        <tr>
+          <td><%= course.course_name %></td>
+          <td><%= student.user_name %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+
