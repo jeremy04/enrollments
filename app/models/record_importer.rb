@@ -1,13 +1,14 @@
 require 'csv'
 
 class RecordImporter
+  include Batchable
+
   CSV_ARGS = {
     :headers => :true,
     :skip_blanks => true,
     :header_converters => :downcase,
     :converters => lambda{|field|field ? field.strip : field}
   }
-
 
   def initialize(file) 
     @file = file
@@ -16,7 +17,7 @@ class RecordImporter
   def call
     CSV.foreach(@file, CSV_ARGS.merge(headers: false)) do |row|
       if row.include?("user_id") && row.include?("user_name")
-        create_students(@file)
+        StudentImporter.new(@file).create_or_update
       elsif row.include?("course_id") && row.include?("course_name")
         create_courses(@file)
       elsif row.include?("course_id") && row.include?("user_id")
@@ -30,12 +31,26 @@ class RecordImporter
 
   private
 
-  def create_students(file)
-    CSV.foreach(file, CSV_ARGS.merge({ headers: true} )) do |row|
-      student = Student.find_or_create_by(user_id: row['user_id'])
-      student.update(row.to_hash)
+  # Performance issue: find_or_create_by will do two queries for every record, Sqllite has no support for mult-insert insert + update like ON DUPLICATE KEY
+
+  class StudentImporter
+    include Batchable
+    
+    def initialize(file)
+      @file = file
+    end
+
+    def create_or_update
+      read_in_batches(@file) do |rows|
+        rows.each do |row|
+          student = Student.find_or_create_by(user_id: row['user_id'])
+          student.update(row.to_hash)
+        end
+      end
     end
   end
+
+  #TODO: refactor the rest
 
   def create_courses(file)
     CSV.foreach(file, CSV_ARGS.merge({ headers: true} )) do |row|

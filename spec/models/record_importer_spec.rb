@@ -13,6 +13,8 @@ describe "RecordImporter" do
           { user_id: "U346561", user_name: "Chloe Wood", state: "active"} 
         ]
 
+        allow(Batchable).to receive(:line_count).and_return(1)
+
 
         expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: false)).and_yield(csv[0])
         expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: true)).and_yield(csv[1]).and_yield(csv[2])
@@ -30,6 +32,7 @@ describe "RecordImporter" do
           { user_id: "U531649", user_name: "Noah Thomas", state: "deleted"}.with_indifferent_access, 
         ]
 
+        allow(Batchable).to receive(:line_count).and_return(1)
 
         expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: false)).and_yield(csv[0])
         expect(CSV).to receive(:foreach).with("csv_file", RecordImporter::CSV_ARGS.merge(headers: true)).and_yield(csv[1])
