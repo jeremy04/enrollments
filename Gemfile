@@ -15,6 +15,7 @@ gem 'sass-rails', '~> 5.0'
 gem 'jquery-rails'
 gem 'bootstrap-sass'
 gem 'jquery-datatables-rails', '~> 3.3.0'
+gem 'uglifier'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
