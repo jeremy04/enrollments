@@ -1,7 +1,5 @@
 class AlterStateForCourses < ActiveRecord::Migration
   def change
-    change_table :courses do |t|
-      t.change :state, :integer
-    end
+    change_column :courses, :state, 'integer USING CAST(state AS integer)'
   end
 end
