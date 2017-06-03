@@ -42,4 +42,6 @@ Shortcomings:
 - SQLite3 has no enums, or foreign key constraints that work with Rail's adapters
 - My motto is make it work before you make it pretty. Maybe add a Search UI ?
 
+* update * - Upgraded to Postgres for Heroku
 
+[View Heroku site](https://enrollments-sample.herokuapp.com/)
