@@ -6,14 +6,6 @@
     </tr>
   </thead>
   <tbody>
-    <% @courses.each do |course| %>
-      <% course.students.each do |student| %>
-        <tr>
-          <td><%= course.course_name %></td>
-          <td><%= student.user_name %></td>
-        </tr>
-      <% end %>
-    <% end %>
   </tbody>
 </table>
 

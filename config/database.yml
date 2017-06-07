@@ -1,2 +1,18 @@
+default: &default
+  adapter: postgresql
+  pool: 5
+
+development:
+  <<: *default
+  database: enrollments_development
+  username: enrollments
+  password: enrollments
+
+test:
+  <<: *default
+  database: enrollments_test
+  username: enrollments
+  password: enrollments
+
 production:
     url: <%= ENV['DATABASE_URL'] %>

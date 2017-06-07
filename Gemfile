@@ -16,6 +16,7 @@ gem 'jquery-rails'
 gem 'bootstrap-sass'
 gem 'jquery-datatables-rails', '~> 3.3.0'
 gem 'uglifier'
+gem 'kaminari'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
@@ -36,6 +37,8 @@ group :development, :test do
   gem 'byebug'
   gem 'rspec-rails'
   gem 'capybara'
+  gem 'poltergeist'
+  gem 'database_cleaner'
 end
 
 group :development do
