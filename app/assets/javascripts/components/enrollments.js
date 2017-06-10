@@ -1,11 +1,11 @@
 $(function() {
 
-  $("#courses_list").dataTable({
+  $("#enrollments").dataTable({
     bAutoWidth: false,
     lengthChange: false, // disable show per page
     processing: true,
     serverSide: true,
-    ajax: "/",
+    ajax: $(this).data('url'),
     language: {
       search: "_INPUT_",
       searchPlaceholder: 'Filter results',
@@ -13,7 +13,7 @@ $(function() {
       infoFiltered: ''
     },
     columnDefs: [
-      { targets: 0, sortable: true } 
+      { orderData: [0, 1], targets: 0, sortable: true } 
     ]
   });
 

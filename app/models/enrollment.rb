@@ -9,6 +9,7 @@ class Enrollment < ActiveRecord::Base
     self
       .joins(:course).where(courses: { state: 'active' })
       .joins('LEFT JOIN "students" ON "students".user_id = "enrollments".user_id AND "students"."state" = 0')
+      .where('students.user_name IS NOT NULL')
       .active
   end
 

@@ -1,7 +1,7 @@
 require "rails_helper"
 
-feature "Viewing courses" do
-  scenario "Display all active courses", js: true do
+feature "Viewing active enrollments" do
+  scenario "Display all active enrollments, for active students with active courses", js: true do
     Student.create!(user_id: "U531649", state: "active", user_name: "Jeremy Lipson")
     Student.create!(user_id: "U500000", state: "active", user_name: "Frank Bauer")
     Course.create!(course_id: "C628944", course_name: "Math", state: "active")
