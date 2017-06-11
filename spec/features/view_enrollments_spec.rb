@@ -8,6 +8,7 @@ feature "Viewing active enrollments" do
     Enrollment.create!(course_id: "C628944", user_id: "U500000", state: "deleted")
     Enrollment.create!(course_id: "C628944", user_id: "U531649", state: "active")        
     visit "/"
+    page.fill_in "Search:", with: "Jer"
     expect(page).to have_content('Math')
     expect(page).to have_content('Jeremy Lipson')
     expect(page).to have_no_content('Frank Bauer')

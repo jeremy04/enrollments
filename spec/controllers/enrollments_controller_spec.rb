@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe CourseListController, type: :controller do
+RSpec.describe EnrollmentsController, type: :controller do
 
   describe "GET #index" do
     it "returns http success" do
