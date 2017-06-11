@@ -1,5 +1,4 @@
 $(function() {
-
   $("#enrollments")
     .DataTable({
     bAutoWidth: false,
@@ -7,7 +6,8 @@ $(function() {
     processing: true,
     deferLoading: 10,
     serverSide: true,
-    ajax: $(this).data('url'),
+    // $(this).data('url') .. works but produces JS error
+    ajax: $("#enrollments").data('url'),
     language: {
       searchPlaceholder: 'Filter results',
       zeroRecords: 'No results were found',
